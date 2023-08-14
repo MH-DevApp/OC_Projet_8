@@ -42,6 +42,16 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
         ],
+        "load": [
+            "symfony console d:d:d --force --if-exists --env=dev",
+            "symfony console d:d:c --env=dev",
+            "symfony console d:s:u -f --env=dev",
+            "symfony console doctrine:database:import fixtures.sql",
+            "symfony console c:c --env=dev"
+        ],
+        "load-docker": [
+            "docker exec -it php symfony composer run load"
+        ],
         "post-install-cmd": [
             "@symfony-scripts"
         ],
