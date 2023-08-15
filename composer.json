@@ -52,6 +52,7 @@
         "load-docker": [
             "docker exec -it php symfony composer run load"
         ],
+        "tests": "docker exec -it php vendor/bin/simple-phpunit",
         "post-install-cmd": [
             "@symfony-scripts"
         ],
