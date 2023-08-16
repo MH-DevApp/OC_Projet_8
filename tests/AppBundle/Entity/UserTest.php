@@ -26,6 +26,7 @@ class UserTest extends TestCase
         $this->assertEquals($username, $user->getUsername());
         $this->assertEquals($email, $user->getEmail());
         $this->assertEquals($password, $user->getPassword());
+        $this->assertNull($user->getId());
     }
 
     public function dataProviderSomeUsers()

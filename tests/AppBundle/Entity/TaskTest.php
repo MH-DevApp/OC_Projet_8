@@ -24,6 +24,11 @@ class TaskTest extends TestCase
         $this->assertEquals($content, $task->getContent());
         $this->assertEquals($isDone, $task->isDone());
         $this->assertInstanceOf(DateTime::class, $task->getCreatedAt());
+        $this->assertNull($task->getId());
+
+        $createdAt = new DateTime('now');
+        $task->setCreatedAt($createdAt);
+        $this->assertEquals($createdAt, $task->getCreatedAt());
     }
 
     public function dataProviderSomeTasks()
