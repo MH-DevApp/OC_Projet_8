@@ -46,13 +46,26 @@
             "symfony console d:d:d --force --if-exists --env=dev",
             "symfony console d:d:c --env=dev",
             "symfony console d:s:u -f --env=dev",
-            "symfony console doctrine:database:import fixtures.sql",
+            "symfony console doctrine:database:import fixtures.sql --env=test",
             "symfony console c:c --env=dev"
+        ],
+        "load-tests": [
+            "symfony console d:d:d --force --if-exists --env=test",
+            "symfony console d:d:c --env=test",
+            "symfony console d:s:u -f --env=test",
+            "symfony console doctrine:database:import fixtures.sql --env=test",
+            "symfony console c:c --env=test"
         ],
         "load-docker": [
             "docker exec -it php symfony composer run load"
         ],
-        "tests": "docker exec -it php vendor/bin/simple-phpunit",
+        "tests": [
+            "composer run load-tests",
+            "vendor/bin/simple-phpunit"
+        ],
+        "tests-docker": [
+            "docker exec -it php composer run tests"
+        ],
         "post-install-cmd": [
             "@symfony-scripts"
         ],
