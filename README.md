@@ -149,7 +149,7 @@ Once your Docker configuration is up and ready, you can follow the instructions 
     ```bash
     > docker-compose -f ../docker-compose.dev.yml down -v --remove-orphans
     ```
-   ##### The generated Docker container uses PHP8.2, MySQL 8.0 and phpMyAdmin.
+   ##### The generated Docker containers uses Ubuntu 22.04 with PHP5.6, MySQL 5.7 and phpMyAdmin.
 
 The website is available at the url: https://localhost:3000
 
