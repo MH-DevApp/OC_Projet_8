@@ -46,7 +46,7 @@
             "symfony console d:d:d --force --if-exists --env=dev",
             "symfony console d:d:c --env=dev",
             "symfony console d:s:u -f --env=dev",
-            "symfony console doctrine:database:import fixtures.sql --env=test",
+            "symfony console doctrine:database:import fixtures.sql --env=dev",
             "symfony console c:c --env=dev"
         ],
         "load-tests": [
