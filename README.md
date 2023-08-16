@@ -94,7 +94,7 @@ Once your Docker configuration is up and ready, you can follow the instructions 
 1. To create a volume for the database:
 
     ```bash
-    > docker volume create oc_dev
+    > docker volume create oc_dev_5.7
     ```
    
 2. Create `parameters.yml` file in the folder `./app/config` with the following information:
