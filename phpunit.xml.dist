@@ -15,8 +15,13 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests/AppBundle/Entity</directory>
+            <directory>tests/AppBundle/Controller</directory>
         </testsuite>
     </testsuites>
+
+    <logging>
+        <log type="coverage-html" target="web/coverage" showUncoveredFiles="true"/>
+    </logging>
 
     <filter>
         <whitelist>
