@@ -7,6 +7,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -34,10 +35,17 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$user->getPassword()) {
+                throw new BadRequestException(
+                    "Le mot de passe doit être une chaîne de caractère."
+                );
+            }
+
             $password = $passwordHasher->hashPassword(
                 $user,
                 $user->getPassword()
             );
+
             $user->setPassword($password);
 
             $entityManager->persist($user);
@@ -67,10 +75,17 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$user->getPassword()) {
+                throw new BadRequestException(
+                    "Le mot de passe doit être une chaîne de caractère."
+                );
+            }
+
             $password = $passwordHasher->hashPassword(
                 $user,
                 $user->getPassword()
             );
+
             $user->setPassword($password);
 
             $entityManager->flush();

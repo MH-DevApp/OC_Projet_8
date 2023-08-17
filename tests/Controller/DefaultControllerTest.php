@@ -19,33 +19,48 @@ class DefaultControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
 
-        $this->urlGenerator = $this->client
+        /** @var ?UrlGeneratorInterface $urlGenerator */
+        $urlGenerator = $this->client
             ->getContainer()
             ->get('router');
+
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function testHomePageWithoutBeingAuthenticated(): void
     {
-        $this->client->request(
+        $this->client?->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('homepage')
+            $this->urlGenerator?->generate('homepage') ?? ''
         );
 
-        $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(
+            Response::HTTP_FOUND,
+            $this->client?->getResponse()->getStatusCode()
+        );
 
-        $this->client->followRedirect();
+        $this->client?->followRedirect();
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/login', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(
+            Response::HTTP_OK,
+            $this->client?->getResponse()->getStatusCode()
+        );
+        $this->assertEquals(
+            '/login',
+            $this->client?->getRequest()->getPathInfo()
+        );
     }
 
     public function testHomePageWhileBeingAuthenticated(): void
     {
-        $this->client = UtilsTests::createAuthenticatedClient($this->client, 'user');
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+
+        $this->client = UtilsTests::createAuthenticatedClient($client, 'user');
         $crawler = $this->client->getCrawler();
 
         $info = $crawler->filter('h1')->text();
-        $info = trim(preg_replace('/\s\s+/', ' ', $info));
+        $info = trim(preg_replace('/\s\s+/', ' ', $info) ?? '');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertSame(
