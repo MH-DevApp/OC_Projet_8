@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Tests\UtilsTests\UtilsTests;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -41,19 +42,84 @@ class UserControllerTest extends WebTestCase
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function testGetUserList(): void
+    public function testAllRoutesUsersWithoutBeingAuthenticated(): void
     {
-        $countUsers = count($this->repositoryUser?->findAll() ?? []);
+        /** @var KernelBrowser $client */
+        $client = $this->client;
 
-        $this->client?->request(
+        // user_list
+        $client->request(
             Request::METHOD_GET,
             $this->urlGenerator?->generate('user_list') ?? ''
         );
 
-        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertRedirectForGetAllRoutesUsersWithoutBeingAuthenticated();
 
-        /** @var Crawler $crawler */
-        $crawler = $this->client?->getCrawler();
+        // user_create
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('user_create') ?? ''
+        );
+
+        $this->assertRedirectForGetAllRoutesUsersWithoutBeingAuthenticated();
+
+        // user_edit
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('user_edit', ['id' => 1]) ?? ''
+        );
+
+        $this->assertRedirectForGetAllRoutesUsersWithoutBeingAuthenticated();
+    }
+
+    public function testAllRoutesUsersWithAuthenticatedWithoutRoleAdmin(): void
+    {
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+
+        $client = UtilsTests::createAuthenticatedClient($client, 'user');
+
+        // user_list
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('user_list') ?? ''
+        );
+
+        $this->assertRedirectForGetAllRoutesUsersWithAuthenticatedWithoutRoleAdmin();
+
+        // user_create
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('user_create') ?? ''
+        );
+
+        $this->assertRedirectForGetAllRoutesUsersWithAuthenticatedWithoutRoleAdmin();
+
+        // user_edit
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('user_edit', ['id' => 1]) ?? ''
+        );
+
+        $this->assertRedirectForGetAllRoutesUsersWithAuthenticatedWithoutRoleAdmin();
+    }
+
+    public function testGetUserList(): void
+    {
+        $countUsers = count($this->repositoryUser?->findAll() ?? []);
+
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+        $client = UtilsTests::createAuthenticatedClient($client, 'admin');
+
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('user_list') ?? ''
+        );
+
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+
+        $crawler = $client->getCrawler();
         $countUsersDom = $crawler->filter('tbody tr th')->count();
 
         $this->assertEquals($countUsers, $countUsersDom);
@@ -63,18 +129,21 @@ class UserControllerTest extends WebTestCase
     {
         $countUsers = count($this->repositoryUser?->findAll() ?? []);
 
-        $this->client?->request(
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+        $this->client = UtilsTests::createAuthenticatedClient($client, 'admin');
+
+        $this->client->request(
             Request::METHOD_GET,
             $this->urlGenerator?->generate('user_list') ?? ''
         );
 
-        /** @var Crawler $crawler */
-        $crawler = $this->client?->getCrawler();
+        $crawler = $this->client->getCrawler();
         $link = $crawler->selectLink('Créer un utilisateur')->link();
 
-        $this->client?->click($link);
+        $client->click($link);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertEquals('/users/create', $this->client?->getRequest()->getPathInfo());
 
         // FAILED
@@ -112,6 +181,10 @@ class UserControllerTest extends WebTestCase
 
         $idUser = $user?->getId() ?? -1;
 
+        $this->client = $this->getClientAuthenticated('admin');
+
+        $client = $this->client;
+
         // TEST NOT FOUND PAGE WITH ID NOT EXISTS
 
         $this->assertNotFoundPage(
@@ -119,22 +192,21 @@ class UserControllerTest extends WebTestCase
             $this->urlGenerator?->generate('user_edit', ['id' => 20]) ?? ''
         );
 
-        $this->client?->request(
+        $client->request(
             Request::METHOD_GET,
             $this->urlGenerator?->generate('user_list') ?? ''
         );
 
         /** @var Crawler $crawler */
-        $crawler = $this->client?->getCrawler();
+        $crawler = $client->getCrawler();
         $link = $crawler->filter('a[href="/users/' . $idUser . '/edit"]')->link();
 
-        $this->client?->click($link);
+        $client->click($link);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
-        $this->assertEquals('/users/' . $idUser . '/edit', $this->client?->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals('/users/' . $idUser . '/edit', $client->getRequest()->getPathInfo());
 
-        /** @var Crawler $crawler */
-        $crawler = $this->client?->getCrawler();
+        $crawler = $client->getCrawler();
 
         $form = $crawler->selectButton('Modifier')->form([
             'user[username]' => 'test',
@@ -146,7 +218,7 @@ class UserControllerTest extends WebTestCase
 
         $this->submitFormAndFollowRedirect($form);
 
-        $userUpdated = $this->repositoryUser?->findOneBy(['id' => $idUser,]);
+        $userUpdated = $this->repositoryUser?->findOneBy(['email' => 'edit-test@test.fr']);
 
         $this->assertInstanceOf(User::class, $userUpdated);
         $this->assertNotNull($userUpdated);
@@ -228,6 +300,21 @@ class UserControllerTest extends WebTestCase
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client?->getResponse()->getStatusCode());
     }
 
+    private function assertRedirectForGetAllRoutesUsersWithoutBeingAuthenticated(): void
+    {
+        $this->assertEquals(Response::HTTP_FOUND, $this->client?->getResponse()->getStatusCode());
+
+        $this->client?->followRedirect();
+
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals('/login', $this->client?->getRequest()->getPathInfo());
+    }
+
+    private function assertRedirectForGetAllRoutesUsersWithAuthenticatedWithoutRoleAdmin(): void
+    {
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client?->getResponse()->getStatusCode());
+    }
+
     private function submitFormAndFollowRedirect(Form $form): void
     {
         $this->client?->submit($form);
@@ -238,6 +325,16 @@ class UserControllerTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
         $this->assertEquals('/users', $this->client?->getRequest()->getPathInfo());
+    }
+
+    private function getClientAuthenticated(string $username): KernelBrowser
+    {
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+        return UtilsTests::createAuthenticatedClient(
+            $client,
+            $username
+        );
     }
 
     public function tearDown(): void
