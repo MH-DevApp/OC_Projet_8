@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
 {
-    #[Route('/tasks', name: 'task_list')]
+    #[Route('/tasks', name: 'task_list', methods: ['GET'])]
     public function listAction(TaskRepository $taskRepository): Response
     {
         return $this->render('task/list.html.twig', [
@@ -21,7 +21,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/tasks/create', name: 'task_create')]
+    #[Route('/tasks/create', name: 'task_create', methods: ['GET', 'POST'])]
     public function createAction(
         Request $request,
         EntityManagerInterface $entityManager
@@ -46,7 +46,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/tasks/{id}/edit', name: 'task_edit')]
+    #[Route('/tasks/{id}/edit', name: 'task_edit', methods: ['GET', 'POST'])]
     public function editAction(
         Task $task,
         Request $request,
@@ -70,7 +70,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/tasks/{id}/toggle', name: 'task_toggle')]
+    #[Route('/tasks/{id}/toggle', name: 'task_toggle', methods: ['GET', 'POST'])]
     public function toggleTaskAction(
         Task $task,
         EntityManagerInterface $entityManager
@@ -84,7 +84,7 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list');
     }
 
-    #[Route('/tasks/{id}/delete', name: 'task_delete')]
+    #[Route('/tasks/{id}/delete', name: 'task_delete', methods: ['GET', 'POST'])]
     public function deleteTaskAction(
         Task $task,
         EntityManagerInterface $entityManager

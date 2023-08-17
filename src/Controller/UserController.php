@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
-    #[Route('/users', name: 'user_list')]
+    #[Route('/users', name: 'user_list', methods: ['GET'])]
     public function listAction(UserRepository $userRepository): Response
     {
         return $this->render('user/list.html.twig', [
@@ -22,7 +22,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/users/create', name: 'user_create')]
+    #[Route('/users/create', name: 'user_create', methods: ['GET', 'POST'])]
     public function createAction(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -58,7 +58,7 @@ class UserController extends AbstractController
 
     }
 
-    #[Route('/users/{id}/edit', name: 'user_edit')]
+    #[Route('/users/{id}/edit', name: 'user_edit', methods: ['GET', 'POST'])]
     public function editAction(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,

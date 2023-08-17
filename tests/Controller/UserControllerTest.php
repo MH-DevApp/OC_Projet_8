@@ -182,7 +182,7 @@ class UserControllerTest extends WebTestCase
 
         $crawler = $this->client->getCrawler();
 
-        $errors = $crawler->filter('div.form-group span.help-block ul li');
+        $errors = $crawler->filter('div.invalid-feedback');
 
         $indexNode = 0;
         foreach ($values as $value) {

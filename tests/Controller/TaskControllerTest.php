@@ -135,7 +135,7 @@ class TaskControllerTest extends WebTestCase
 
         $crawler = $this->client->getCrawler();
 
-        $errors = $crawler->filter('div.form-group span.help-block ul li');
+        $errors = $crawler->filter('div.invalid-feedback');
 
         $errorTitle = trim($errors->getNode(0)->textContent);
         $errorContent = trim($errors->getNode(1)->textContent);
