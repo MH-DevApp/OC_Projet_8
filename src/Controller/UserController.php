@@ -27,8 +27,7 @@ class UserController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager
-    ): Response
-    {
+    ): Response {
         $user = new User();
 
         $form = $this->createForm(UserType::class, $user);
@@ -55,7 +54,6 @@ class UserController extends AbstractController
         return $this->render('user/create.html.twig', [
             'form' => $form->createView()
         ]);
-
     }
 
     #[Route('/users/{id}/edit', name: 'user_edit', methods: ['GET', 'POST'])]
@@ -64,8 +62,7 @@ class UserController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager,
         User $user
-    ): Response
-    {
+    ): Response {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 

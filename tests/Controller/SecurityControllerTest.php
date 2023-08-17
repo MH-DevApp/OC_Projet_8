@@ -77,7 +77,6 @@ class SecurityControllerTest extends WebTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertEquals('/login', $this->client->getRequest()->getPathInfo());
         $this->assertNull($userAuthenticated);
-
     }
 
     public function tearDown(): void

@@ -25,8 +25,7 @@ class TaskController extends AbstractController
     public function createAction(
         Request $request,
         EntityManagerInterface $entityManager
-    ): Response
-    {
+    ): Response {
         $task = new Task();
 
         $form = $this->createForm(TaskType::class, $task);
@@ -51,8 +50,7 @@ class TaskController extends AbstractController
         Task $task,
         Request $request,
         EntityManagerInterface $entityManager
-    ): Response
-    {
+    ): Response {
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
@@ -74,8 +72,7 @@ class TaskController extends AbstractController
     public function toggleTaskAction(
         Task $task,
         EntityManagerInterface $entityManager
-    ): Response
-    {
+    ): Response {
         $task->toggle(!$task->isDone());
         $entityManager->flush();
 
@@ -88,8 +85,7 @@ class TaskController extends AbstractController
     public function deleteTaskAction(
         Task $task,
         EntityManagerInterface $entityManager
-    ): Response
-    {
+    ): Response {
         $entityManager->remove($task);
         $entityManager->flush();
 

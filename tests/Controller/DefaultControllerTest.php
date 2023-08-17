@@ -53,5 +53,4 @@ class DefaultControllerTest extends WebTestCase
             $info
         );
     }
-
 }

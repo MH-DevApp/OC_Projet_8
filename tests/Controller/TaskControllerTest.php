@@ -101,7 +101,6 @@ class TaskControllerTest extends WebTestCase
         $countTasksDom = $crawler->filter('div.row div.thumbnail')->count();
 
         $this->assertEquals($countTasks, $countTasksDom);
-
     }
 
     public function testCreateTask(): void
@@ -192,7 +191,7 @@ class TaskControllerTest extends WebTestCase
         $this->client->click($link);
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/tasks/'.$idTask.'/edit', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals('/tasks/' . $idTask . '/edit', $this->client->getRequest()->getPathInfo());
 
         $crawler = $this->client->getCrawler();
 
@@ -209,7 +208,6 @@ class TaskControllerTest extends WebTestCase
         $this->assertNotNull($this->task);
         $this->assertEquals('edit test title', $this->task->getTitle());
         $this->assertEquals('edit test content', $this->task->getContent());
-
     }
 
     public function testToggleTask(): void
@@ -236,7 +234,7 @@ class TaskControllerTest extends WebTestCase
         );
 
         $crawler = $this->client->getCrawler();
-        $form = $crawler->filter('form[action="/tasks/'.$idTask.'/toggle"]')->form();
+        $form = $crawler->filter('form[action="/tasks/' . $idTask . '/toggle"]')->form();
 
         $this->submitFormAndFollowRedirect($form);
 
@@ -245,7 +243,6 @@ class TaskControllerTest extends WebTestCase
         $this->assertInstanceOf(Task::class, $this->task);
         $this->assertNotNull($this->task);
         $this->assertTrue($this->task->isDone());
-
     }
 
     public function testDeleteTask(): void
@@ -272,7 +269,7 @@ class TaskControllerTest extends WebTestCase
         );
 
         $crawler = $this->client->getCrawler();
-        $form = $crawler->filter('form[action="/tasks/'.$idTask.'/delete"]')->form();
+        $form = $crawler->filter('form[action="/tasks/' . $idTask . '/delete"]')->form();
 
         $this->submitFormAndFollowRedirect($form);
 
@@ -285,7 +282,6 @@ class TaskControllerTest extends WebTestCase
     {
         $this->client->request($method, $path);
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-
     }
 
     private function assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated(): void

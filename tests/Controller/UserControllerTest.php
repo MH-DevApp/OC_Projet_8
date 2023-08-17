@@ -46,7 +46,6 @@ class UserControllerTest extends WebTestCase
         $countUsersDom = $crawler->filter('tbody tr th')->count();
 
         $this->assertEquals($countUsers, $countUsersDom);
-
     }
 
     public function testCreateUser(): void
@@ -109,12 +108,12 @@ class UserControllerTest extends WebTestCase
         );
 
         $crawler = $this->client->getCrawler();
-        $link = $crawler->filter('a[href="/users/'.$idUser.'/edit"]')->link();
+        $link = $crawler->filter('a[href="/users/' . $idUser . '/edit"]')->link();
 
         $this->client->click($link);
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/users/'.$idUser.'/edit', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals('/users/' . $idUser . '/edit', $this->client->getRequest()->getPathInfo());
 
         $crawler = $this->client->getCrawler();
 
@@ -132,7 +131,6 @@ class UserControllerTest extends WebTestCase
         $this->assertInstanceOf(User::class, $userUpdated);
         $this->assertNotNull($userUpdated);
         $this->assertEquals('edit-test@test.fr', $userUpdated->getEmail());
-
     }
 
     private function failedSubmitFormUser(): void
@@ -198,7 +196,6 @@ class UserControllerTest extends WebTestCase
     {
         $this->client->request($method, $path);
         $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-
     }
 
     private function submitFormAndFollowRedirect(Form $form): void
