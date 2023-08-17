@@ -86,9 +86,15 @@
             "symfony console d:s:u -f --env=test",
             "symfony console d:f:l --env=test -n"
         ],
+        "load-docker": [
+            "docker exec -it php symfony composer run load"
+        ],
         "tests": [
             "composer run load-tests",
             "XDEBUG_MODE=coverage vendor/bin/simple-phpunit"
+        ],
+        "tests-docker": [
+            "docker exec -it php composer run tests"
         ],
         "post-install-cmd": [
             "@auto-scripts"
