@@ -1,17 +1,17 @@
 version: '3.8'
 
-name: "p8-legacy"
+name: "p8"
 services:
   db:
     container_name: db
-    image: "mysql:5.7"
+    image: "mysql:8.0"
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
     volumes:
       - type: volume
-        source: oc_dev_5.7
+        source: oc_dev
         target: /var/lib/mysql
     ports:
       - "3001:3306"
@@ -47,6 +47,6 @@ services:
       - "3000:8000"
 
 volumes:
-  oc_dev_5.7:
+  oc_dev:
     external: true
   tls:
