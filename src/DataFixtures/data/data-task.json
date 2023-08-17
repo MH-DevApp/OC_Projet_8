@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Définir les objectifs du projet",
+    "content": "Organiser une réunion avec l'équipe pour définir clairement les objectifs, les livrables et les attentes du projet web."
+  },
+  {
+    "title": "Créer la structure du site web",
+    "content": "Élaborer une maquette ou un plan détaillé de la structure du site, y compris les pages, les menus et les fonctionnalités."
+  },
+  {
+    "title": "Élaborer le cahier des charges",
+    "content": "Rédiger un cahier des charges complet qui décrit les spécifications techniques, les fonctionnalités, les délais et les ressources nécessaires."
+  },
+  {
+    "title": "Sélectionner les technologies",
+    "content": "Évaluer et choisir les outils, les langages de programmation et les plates-formes qui seront utilisés pour développer le site web."
+  },
+  {
+    "title": "Concevoir l'interface utilisateur",
+    "content": "Travailler avec les concepteurs pour créer une interface utilisateur attrayante et conviviale en tenant compte de l'expérience utilisateur."
+  },
+  {
+    "title": "Développer les fonctionnalités clés",
+    "content": "Programmer les fonctionnalités essentielles du site web, telles que l'inscription des utilisateurs, la navigation, la recherche, etc."
+  },
+  {
+    "title": "Tester et déboguer",
+    "content": "Effectuer des tests approfondis pour détecter et résoudre les bugs, les erreurs d'affichage et les problèmes de compatibilité."
+  },
+  {
+    "title": "Optimiser les performances",
+    "content": "Mettre en œuvre des techniques d'optimisation pour garantir que le site web se charge rapidement et fonctionne efficacement."
+  },
+  {
+    "title": "Rédiger le contenu",
+    "content": "Créer et ajouter le contenu textuel, visuel et multimédia au site web, en veillant à ce qu'il soit informatif et engageant."
+  },
+  {
+    "title": "Lancer le site web",
+    "content": "Préparer le site pour le lancement en mettant en place l'hébergement, en effectuant les derniers tests et en assurant une transition en douceur."
+  }
+]

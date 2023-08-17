@@ -1,6 +1,15 @@
-/app/config/parameters.yml
-/build/
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
 /phpunit.xml
-var
-vendor
-web/bundles/
+.phpunit.result.cache
+###< phpunit/phpunit ###
