@@ -1,42 +1,77 @@
 [
   {
     "title": "Définir les objectifs du projet",
-    "content": "Organiser une réunion avec l'équipe pour définir clairement les objectifs, les livrables et les attentes du projet web."
+    "content": "Organiser une réunion avec l'équipe pour définir clairement les objectifs, les livrables et les attentes du projet web.",
+    "hasAuthor": false
   },
   {
     "title": "Créer la structure du site web",
-    "content": "Élaborer une maquette ou un plan détaillé de la structure du site, y compris les pages, les menus et les fonctionnalités."
+    "content": "Élaborer une maquette ou un plan détaillé de la structure du site, y compris les pages, les menus et les fonctionnalités.",
+    "hasAuthor": false
   },
   {
     "title": "Élaborer le cahier des charges",
-    "content": "Rédiger un cahier des charges complet qui décrit les spécifications techniques, les fonctionnalités, les délais et les ressources nécessaires."
+    "content": "Rédiger un cahier des charges complet qui décrit les spécifications techniques, les fonctionnalités, les délais et les ressources nécessaires.",
+    "hasAuthor": false
   },
   {
     "title": "Sélectionner les technologies",
-    "content": "Évaluer et choisir les outils, les langages de programmation et les plates-formes qui seront utilisés pour développer le site web."
+    "content": "Évaluer et choisir les outils, les langages de programmation et les plates-formes qui seront utilisés pour développer le site web.",
+    "hasAuthor": false
   },
   {
     "title": "Concevoir l'interface utilisateur",
-    "content": "Travailler avec les concepteurs pour créer une interface utilisateur attrayante et conviviale en tenant compte de l'expérience utilisateur."
+    "content": "Travailler avec les concepteurs pour créer une interface utilisateur attrayante et conviviale en tenant compte de l'expérience utilisateur.",
+    "hasAuthor": false
   },
   {
     "title": "Développer les fonctionnalités clés",
-    "content": "Programmer les fonctionnalités essentielles du site web, telles que l'inscription des utilisateurs, la navigation, la recherche, etc."
+    "content": "Programmer les fonctionnalités essentielles du site web, telles que l'inscription des utilisateurs, la navigation, la recherche, etc.",
+    "hasAuthor": false
   },
   {
     "title": "Tester et déboguer",
-    "content": "Effectuer des tests approfondis pour détecter et résoudre les bugs, les erreurs d'affichage et les problèmes de compatibilité."
+    "content": "Effectuer des tests approfondis pour détecter et résoudre les bugs, les erreurs d'affichage et les problèmes de compatibilité.",
+    "hasAuthor": false
   },
   {
     "title": "Optimiser les performances",
-    "content": "Mettre en œuvre des techniques d'optimisation pour garantir que le site web se charge rapidement et fonctionne efficacement."
+    "content": "Mettre en œuvre des techniques d'optimisation pour garantir que le site web se charge rapidement et fonctionne efficacement.",
+    "hasAuthor": false
   },
   {
     "title": "Rédiger le contenu",
-    "content": "Créer et ajouter le contenu textuel, visuel et multimédia au site web, en veillant à ce qu'il soit informatif et engageant."
+    "content": "Créer et ajouter le contenu textuel, visuel et multimédia au site web, en veillant à ce qu'il soit informatif et engageant.",
+    "hasAuthor": false
   },
   {
     "title": "Lancer le site web",
-    "content": "Préparer le site pour le lancement en mettant en place l'hébergement, en effectuant les derniers tests et en assurant une transition en douceur."
+    "content": "Préparer le site pour le lancement en mettant en place l'hébergement, en effectuant les derniers tests et en assurant une transition en douceur.",
+    "hasAuthor": false
+  },
+  {
+    "title": "Mettre en place l'environnement de développement",
+    "content": "Configurer les serveurs, les bases de données et les outils nécessaires pour le développement du site web, en garantissant que tout est prêt pour le processus de création.",
+    "hasAuthor": true
+  },
+  {
+    "title": "Intégrer les maquettes graphiques",
+    "content": "Transformer les maquettes approuvées en code HTML/CSS pour créer une représentation visuelle du site web conforme au design souhaité.",
+    "hasAuthor": true
+  },
+  {
+    "title": "Implémenter les interactions utilisateur",
+    "content": "Ajouter des fonctionnalités interactives telles que des formulaires, des boutons et des animations pour améliorer l'expérience utilisateur du site web.",
+    "hasAuthor": true
+  },
+  {
+    "title": "Effectuer des tests d'acceptation",
+    "content": "Collaborer avec les parties prenantes pour exécuter des tests d'acceptation afin de s'assurer que le site répond aux exigences et fonctionne correctement avant le lancement.",
+    "hasAuthor": true
+  },
+  {
+    "title": "Mettre en place la surveillance post-lancement",
+    "content": "Configurer des outils de surveillance pour suivre les performances du site après le lancement, détecter les problèmes éventuels et prendre des mesures correctives.",
+    "hasAuthor": true
   }
 ]

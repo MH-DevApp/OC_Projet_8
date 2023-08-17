@@ -35,15 +35,12 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$user->getPassword()) {
-                throw new BadRequestException(
-                    "Le mot de passe doit être une chaîne de caractère."
-                );
-            }
+            /** @var string $password */
+            $password = $user->getPassword();
 
             $password = $passwordHasher->hashPassword(
                 $user,
-                $user->getPassword()
+                $password
             );
 
             $user->setPassword($password);
@@ -75,15 +72,12 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$user->getPassword()) {
-                throw new BadRequestException(
-                    "Le mot de passe doit être une chaîne de caractère."
-                );
-            }
+            /** @var string $password */
+            $password = $user->getPassword();
 
             $password = $passwordHasher->hashPassword(
                 $user,
-                $user->getPassword()
+                $password
             );
 
             $user->setPassword($password);

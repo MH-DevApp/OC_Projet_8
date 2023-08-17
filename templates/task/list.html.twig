@@ -9,9 +9,9 @@
         <div class="col-sm-4 col-lg-4 col-md-4 py-2">
             <div class="d-flex flex-column justify-content-between thumbnail shadow rounded p-2">
                 <div class="caption">
-                    <h4 class="pull-right">
-                        {% if task.isDone %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
-                    </h4>
+                    <p class="d-flex justify-content-end">
+                        {% if task.isDone %}<span class="badge badge-success bg-success">Done</span>{% else %}<span class="badge badge-danger bg-danger">In Progress</span>{% endif %}
+                    </p>
                     <h4><a href="{{ path('task_edit', {'id' : task.id }) }}">{{ task.title }}</a></h4>
                     <p class="text-justify">{{ task.content }}</p>
                 </div>

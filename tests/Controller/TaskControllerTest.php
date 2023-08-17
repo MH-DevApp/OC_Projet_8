@@ -185,6 +185,12 @@ class TaskControllerTest extends WebTestCase
         $this->assertInstanceOf(Task::class, $this->task);
         $this->assertNotNull($this->task);
         $this->assertEquals($countTasks + 1, $countTasksAfterAddNewTask);
+
+        // Anomaly correction => User linked during task creation (new feature)
+        $this->assertEquals(
+            $this->task?->getAuthor()?->getUserIdentifier() ?? 'author of task',
+            $this->user?->getUserIdentifier() ?? 'authenticated user'
+        );
     }
 
     public function testUpdateTask(): void
