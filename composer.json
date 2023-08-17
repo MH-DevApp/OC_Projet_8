@@ -74,6 +74,13 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
+        "analyze": [
+            "vendor/bin/phpcs -v;echo '\n';",
+            "vendor/bin/phpstan analyze -l 9"
+        ],
+        "analyze-docker": [
+            "docker exec -it php symfony composer analyze"
+        ],
         "load": [
             "symfony console d:d:d --force --if-exists --env=dev",
             "symfony console d:d:c --env=dev",
@@ -114,7 +121,9 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
+        "squizlabs/php_codesniffer": "^3.7",
         "symfony/browser-kit": "5.4.*",
         "symfony/css-selector": "5.4.*",
         "symfony/debug-bundle": "5.4.*",
