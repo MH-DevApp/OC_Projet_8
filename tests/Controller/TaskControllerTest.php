@@ -88,7 +88,7 @@ class TaskControllerTest extends WebTestCase
         // task_delete
         $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator?->generate('task_toggle', ['id' => 1]) ?? ''
+            $this->urlGenerator?->generate('task_delete', ['id' => 1]) ?? ''
         );
 
         $this->assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated();
