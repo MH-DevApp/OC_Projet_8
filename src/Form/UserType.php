@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -15,7 +16,19 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var User $user */
+        $user = $options['data'];
+
         $builder
+            ->add('isAdmin', CheckboxType::class, [
+                'label' => 'Admin',
+                'row_attr' => [
+                    'class' => 'form-check form-switch'
+                ],
+                'data' => in_array('ROLE_ADMIN', $user->getRoles()),
+                'mapped' => false,
+                'required' => false
+            ])
             ->add('username', TextType::class, [
                 'label' => 'Nom d\'utilisateur'
             ])

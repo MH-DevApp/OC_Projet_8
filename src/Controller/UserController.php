@@ -37,6 +37,8 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var string $password */
             $password = $user->getPassword();
+            /** @var bool $isAdmin */
+            $isAdmin = $form->get('isAdmin')->getData();
 
             $password = $passwordHasher->hashPassword(
                 $user,
@@ -44,6 +46,9 @@ class UserController extends AbstractController
             );
 
             $user->setPassword($password);
+
+            // Anomaly correction => Choosing a role for a user (new feature)
+            $user->isAdmin($isAdmin);
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -74,6 +79,8 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var string $password */
             $password = $user->getPassword();
+            /** @var bool $isAdmin */
+            $isAdmin = $form->get('isAdmin')->getData();
 
             $password = $passwordHasher->hashPassword(
                 $user,
@@ -81,6 +88,9 @@ class UserController extends AbstractController
             );
 
             $user->setPassword($password);
+
+            // Anomaly correction => Choosing a role for a user (new feature)
+            $user->isAdmin($isAdmin);
 
             $entityManager->flush();
 

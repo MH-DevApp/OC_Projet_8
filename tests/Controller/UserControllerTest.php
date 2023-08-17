@@ -88,7 +88,8 @@ class UserControllerTest extends WebTestCase
             'user[username]' => 'test',
             'user[password][first]' => '123456',
             'user[password][second]' => '123456',
-            'user[email]' => 'test@test.fr'
+            'user[email]' => 'test@test.fr',
+            'user[isAdmin]' => false
         ]);
 
         $this->submitFormAndFollowRedirect($form);
@@ -100,9 +101,12 @@ class UserControllerTest extends WebTestCase
         $this->assertInstanceOf(User::class, $newUser);
         $this->assertNotNull($newUser);
         $this->assertEquals($countUsers + 1, $countUsersAfterAddNewTask);
+
+        // Anomaly correction => Choosing a role for a user (new feature)
+        $this->assertNotContains("ROLE_ADMIN", $newUser->getRoles());
     }
 
-    public function testUpdateTask(): void
+    public function testUpdateUser(): void
     {
         $user = $this->repositoryUser?->findOneBy(['username' => 'test']);
 
@@ -136,7 +140,8 @@ class UserControllerTest extends WebTestCase
             'user[username]' => 'test',
             'user[password][first]' => '123456',
             'user[password][second]' => '123456',
-            'user[email]' => 'edit-test@test.fr'
+            'user[email]' => 'edit-test@test.fr',
+            'user[isAdmin]' => true
         ]);
 
         $this->submitFormAndFollowRedirect($form);
@@ -146,6 +151,9 @@ class UserControllerTest extends WebTestCase
         $this->assertInstanceOf(User::class, $userUpdated);
         $this->assertNotNull($userUpdated);
         $this->assertEquals('edit-test@test.fr', $userUpdated->getEmail());
+
+        // Anomaly correction => Choosing a role for a user (new feature)
+        $this->assertContains("ROLE_ADMIN", $userUpdated->getRoles());
     }
 
     private function failedSubmitFormUser(): void
@@ -194,7 +202,7 @@ class UserControllerTest extends WebTestCase
             'user[username]' => $values['username']['value'],
             'user[password][first]' => $values['passwordFirst']['value'],
             'user[password][second]' => $values['passwordSecond']['value'],
-            'user[email]' => $values['email']['value'],
+            'user[email]' => $values['email']['value']
         ]);
 
         $this->client?->submit($form);

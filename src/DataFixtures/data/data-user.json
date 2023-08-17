@@ -1,5 +1,10 @@
 [
   {
+    "username": "admin",
+    "email": "admin@oc-p8.fr",
+    "roles": ["ROLE_ADMIN"]
+  },
+  {
     "username": "user",
     "email": "user@oc-p8.fr",
     "roles": []
