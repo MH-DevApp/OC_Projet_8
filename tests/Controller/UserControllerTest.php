@@ -4,8 +4,10 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,56 +23,66 @@ class UserControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
 
-        $this->repositoryUser = $this->client
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->client
             ->getContainer()
-            ->get('doctrine')
-            ->getRepository(User::class);
+            ->get('doctrine');
 
-        $this->urlGenerator = $this->client
+        /** @var UserRepository $userRepository */
+        $userRepository = $manager->getRepository(User::class);
+
+        $this->repositoryUser = $userRepository;
+
+        /** @var UrlGeneratorInterface $urlGenerator */
+        $urlGenerator = $this->client
             ->getContainer()
             ->get('router');
+
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function testGetUserList(): void
     {
-        $countUsers = count($this->repositoryUser->findAll());
+        $countUsers = count($this->repositoryUser?->findAll() ?? []);
 
-        $this->client->request(
+        $this->client?->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('user_list')
+            $this->urlGenerator?->generate('user_list') ?? ''
         );
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
 
-        $crawler = $this->client->getCrawler();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
         $countUsersDom = $crawler->filter('tbody tr th')->count();
 
         $this->assertEquals($countUsers, $countUsersDom);
-
     }
 
     public function testCreateUser(): void
     {
-        $countUsers = count($this->repositoryUser->findAll());
+        $countUsers = count($this->repositoryUser?->findAll() ?? []);
 
-        $this->client->request(
+        $this->client?->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('user_list')
+            $this->urlGenerator?->generate('user_list') ?? ''
         );
 
-        $crawler = $this->client->getCrawler();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
         $link = $crawler->selectLink('Créer un utilisateur')->link();
 
-        $this->client->click($link);
+        $this->client?->click($link);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/users/create', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals('/users/create', $this->client?->getRequest()->getPathInfo());
 
         // FAILED
         $this->failedSubmitFormUser();
 
         // SUCCESS
-        $crawler = $this->client->getCrawler();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
 
         $form = $crawler->selectButton('Ajouter')->form([
             'user[username]' => 'test',
@@ -81,9 +93,9 @@ class UserControllerTest extends WebTestCase
 
         $this->submitFormAndFollowRedirect($form);
 
-        $newUser = $this->repositoryUser->findOneBy(['username' => 'test']);
+        $newUser = $this->repositoryUser?->findOneBy(['username' => 'test']);
 
-        $countUsersAfterAddNewTask = count($this->repositoryUser->findAll());
+        $countUsersAfterAddNewTask = count($this->repositoryUser?->findAll() ?? []);
 
         $this->assertInstanceOf(User::class, $newUser);
         $this->assertNotNull($newUser);
@@ -92,31 +104,33 @@ class UserControllerTest extends WebTestCase
 
     public function testUpdateTask(): void
     {
-        $user = $this->repositoryUser->findOneBy(['username' => 'test']);
+        $user = $this->repositoryUser?->findOneBy(['username' => 'test']);
 
-        $idUser = $user->getId();
+        $idUser = $user?->getId() ?? -1;
 
         // TEST NOT FOUND PAGE WITH ID NOT EXISTS
 
         $this->assertNotFoundPage(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('user_edit', ['id' => 20])
+            $this->urlGenerator?->generate('user_edit', ['id' => 20]) ?? ''
         );
 
-        $this->client->request(
+        $this->client?->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('user_list')
+            $this->urlGenerator?->generate('user_list') ?? ''
         );
 
-        $crawler = $this->client->getCrawler();
-        $link = $crawler->filter('a[href="/users/'.$idUser.'/edit"]')->link();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
+        $link = $crawler->filter('a[href="/users/' . $idUser . '/edit"]')->link();
 
-        $this->client->click($link);
+        $this->client?->click($link);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/users/'.$idUser.'/edit', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals('/users/' . $idUser . '/edit', $this->client?->getRequest()->getPathInfo());
 
-        $crawler = $this->client->getCrawler();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
 
         $form = $crawler->selectButton('Modifier')->form([
             'user[username]' => 'test',
@@ -127,12 +141,11 @@ class UserControllerTest extends WebTestCase
 
         $this->submitFormAndFollowRedirect($form);
 
-        $userUpdated = $this->repositoryUser->findOneBy(['id' => $idUser,]);
+        $userUpdated = $this->repositoryUser?->findOneBy(['id' => $idUser,]);
 
         $this->assertInstanceOf(User::class, $userUpdated);
         $this->assertNotNull($userUpdated);
         $this->assertEquals('edit-test@test.fr', $userUpdated->getEmail());
-
     }
 
     private function failedSubmitFormUser(): void
@@ -166,9 +179,15 @@ class UserControllerTest extends WebTestCase
         ]);
     }
 
+    /**
+     * @param array<string, array<string, string|null>> $values
+     *
+     * @return void
+     */
     private function assertValidationFormCreateUser(array $values): void
     {
-        $crawler = $this->client->getCrawler();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
 
         // FAILED
         $form = $crawler->selectButton('Ajouter')->form([
@@ -178,16 +197,17 @@ class UserControllerTest extends WebTestCase
             'user[email]' => $values['email']['value'],
         ]);
 
-        $this->client->submit($form);
+        $this->client?->submit($form);
 
-        $crawler = $this->client->getCrawler();
+        /** @var Crawler $crawler */
+        $crawler = $this->client?->getCrawler();
 
         $errors = $crawler->filter('div.invalid-feedback');
 
         $indexNode = 0;
         foreach ($values as $value) {
             if ($value['error'] !== null) {
-                $error = trim($errors->getNode($indexNode)->textContent);
+                $error = trim($errors->getNode($indexNode)?->textContent ?? '');
                 $this->assertEquals($value['error'], $error);
                 $indexNode++;
             }
@@ -196,21 +216,20 @@ class UserControllerTest extends WebTestCase
 
     private function assertNotFoundPage(string $method, string $path): void
     {
-        $this->client->request($method, $path);
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-
+        $this->client?->request($method, $path);
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client?->getResponse()->getStatusCode());
     }
 
     private function submitFormAndFollowRedirect(Form $form): void
     {
-        $this->client->submit($form);
+        $this->client?->submit($form);
 
-        $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FOUND, $this->client?->getResponse()->getStatusCode());
 
-        $this->client->followRedirect();
+        $this->client?->followRedirect();
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/users', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals('/users', $this->client?->getRequest()->getPathInfo());
     }
 
     public function tearDown(): void

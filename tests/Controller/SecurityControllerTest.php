@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,21 +18,35 @@ class SecurityControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
 
-        $this->user = $this->client
-            ->getContainer()
-            ->get('doctrine')
-            ->getRepository(User::class)
-            ->findOneBy(['username' => 'user']);
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->client->getContainer()->get('doctrine');
+
+        /** @var ?User $user */
+        $user = $manager->getRepository(User::class)->findOneBy(['username' => 'user']);
+
+        $this->user = $user;
     }
 
     public function testLoginSuccessful(): void
     {
-        $this->client = UtilsTests::createAuthenticatedClient($this->client, $this->user->getUserIdentifier());
+        /** @var KernelBrowser $client */
+        $client = $this->client;
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/', $this->client->getRequest()->getPathInfo());
+        $client = UtilsTests::createAuthenticatedClient(
+            $client,
+            $this->user?->getUserIdentifier() ?? ''
+        );
 
-        $userAuthenticated = UtilsTests::getAuthenticatedUser($this->client);
+        $this->assertEquals(
+            Response::HTTP_OK,
+            $client->getResponse()->getStatusCode()
+        );
+        $this->assertEquals(
+            '/',
+            $client->getRequest()->getPathInfo()
+        );
+
+        $userAuthenticated = UtilsTests::getAuthenticatedUser($client);
 
         $this->assertInstanceOf(User::class, $userAuthenticated);
         $this->assertEquals($this->user, $userAuthenticated);
@@ -39,45 +54,53 @@ class SecurityControllerTest extends WebTestCase
 
     public function testLoginFailure(): void
     {
-        $this->client = UtilsTests::createAuthenticatedClient($this->client, 'fail');
+        /** @var KernelBrowser $client */
+        $client = $this->client;
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/login', $this->client->getRequest()->getPathInfo());
+        $client = UtilsTests::createAuthenticatedClient($client, 'fail');
 
-        $userAuthenticated = UtilsTests::getAuthenticatedUser($this->client);
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals('/login', $client->getRequest()->getPathInfo());
+
+        $userAuthenticated = UtilsTests::getAuthenticatedUser($client);
 
         $this->assertNull($userAuthenticated);
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
         $error = $crawler->filter('div.alert.alert-danger')->text();
-        $error = trim(preg_replace('/\s\s+/', ' ', $error));
+        $error = trim(preg_replace('/\s\s+/', ' ', $error) ?? '');
 
         $this->assertEquals('Invalid credentials.', $error);
     }
 
     public function testLogoutWithLink(): void
     {
-        $this->client = UtilsTests::createAuthenticatedClient($this->client, $this->user->getUserIdentifier());
+        /** @var KernelBrowser $client */
+        $client = $this->client;
 
-        $userAuthenticated = UtilsTests::getAuthenticatedUser($this->client);
+        $client = UtilsTests::createAuthenticatedClient(
+            $client,
+            $this->user?->getUserIdentifier() ?? ''
+        );
+
+        $userAuthenticated = UtilsTests::getAuthenticatedUser($client);
 
         $this->assertEquals($this->user, $userAuthenticated);
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
         $link = $crawler->selectLink('Se déconnecter')->link();
-        $this->client->click($link);
-        $this->client->followRedirect();
+        $client->click($link);
+        $client->followRedirect();
 
-        $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
 
-        $this->client->followRedirect();
+        $client->followRedirect();
 
-        $userAuthenticated = UtilsTests::getAuthenticatedUser($this->client);
+        $userAuthenticated = UtilsTests::getAuthenticatedUser($client);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/login', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals('/login', $client->getRequest()->getPathInfo());
         $this->assertNull($userAuthenticated);
-
     }
 
     public function tearDown(): void

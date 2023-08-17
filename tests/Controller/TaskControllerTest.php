@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use App\Repository\TaskRepository;
 use App\Entity\Task;
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Form;
@@ -25,60 +26,69 @@ class TaskControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
 
-        $doctrine = $this->client
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->client
             ->getContainer()
             ->get('doctrine');
 
-        $this->user = $doctrine
+        $this->user = $manager
             ->getRepository(User::class)
             ->findOneBy(['username' => 'user']);
 
-        $this->repositoryTask = $doctrine
-            ->getRepository(Task::class);
+        /** @var TaskRepository $taskRepository */
+        $taskRepository = $manager->getRepository(Task::class);
 
-        $this->urlGenerator = $this->client
+        $this->repositoryTask = $taskRepository;
+
+        /** @var ?UrlGeneratorInterface $urlGenerator */
+        $urlGenerator = $this->client
             ->getContainer()
             ->get('router');
+
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function testAllRoutesTasksWithoutBeingAuthenticated(): void
     {
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+
         // task_list
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list')
+            $this->urlGenerator?->generate('task_list') ?? ''
         );
 
         $this->assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated();
 
         // task_create
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_create')
+            $this->urlGenerator?->generate('task_create') ?? ''
         );
 
         $this->assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated();
 
         // task_edit
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_edit', ['id' => 1])
+            $this->urlGenerator?->generate('task_edit', ['id' => 1]) ?? ''
         );
 
         $this->assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated();
 
         // task_toggle
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_toggle', ['id' => 1])
+            $this->urlGenerator?->generate('task_toggle', ['id' => 1]) ?? ''
         );
 
         $this->assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated();
 
         // task_delete
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_toggle', ['id' => 1])
+            $this->urlGenerator?->generate('task_toggle', ['id' => 1]) ?? ''
         );
 
         $this->assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated();
@@ -86,44 +96,52 @@ class TaskControllerTest extends WebTestCase
 
     public function testGetTasksList(): void
     {
-        $countTasks = count($this->repositoryTask->findAll());
+        $countTasks = count($this->repositoryTask?->findAll() ?? []);
 
-        $this->client = $this->getClientAuthenticated();
+        $client = $this->getClientAuthenticated();
 
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list')
+            $this->urlGenerator?->generate('task_list') ?? ''
         );
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(
+            Response::HTTP_OK,
+            $client->getResponse()->getStatusCode()
+        );
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
         $countTasksDom = $crawler->filter('div.row div.thumbnail')->count();
 
         $this->assertEquals($countTasks, $countTasksDom);
-
     }
 
     public function testCreateTask(): void
     {
-        $countTasks = count($this->repositoryTask->findAll());
+        $countTasks = count($this->repositoryTask?->findAll() ?? []);
 
-        $this->client = $this->getClientAuthenticated();
+        $client = $this->getClientAuthenticated();
 
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list')
+            $this->urlGenerator?->generate('task_list') ?? ''
         );
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
         $link = $crawler->selectLink('Créer une tâche')->link();
 
-        $this->client->click($link);
+        $client->click($link);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/tasks/create', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(
+            Response::HTTP_OK,
+            $client->getResponse()->getStatusCode()
+        );
+        $this->assertEquals(
+            '/tasks/create',
+            $client->getRequest()->getPathInfo()
+        );
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
 
         // FAILED
         $form = $crawler->selectButton('Ajouter')->form([
@@ -131,17 +149,23 @@ class TaskControllerTest extends WebTestCase
             'task[content]' => ''
         ]);
 
-        $this->client->submit($form);
+        $client->submit($form);
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
 
         $errors = $crawler->filter('div.invalid-feedback');
 
-        $errorTitle = trim($errors->getNode(0)->textContent);
-        $errorContent = trim($errors->getNode(1)->textContent);
+        $errorTitle = trim($errors->getNode(0)?->textContent ?? '');
+        $errorContent = trim($errors->getNode(1)?->textContent ?? '');
 
-        $this->assertEquals('Vous devez saisir un titre.', $errorTitle);
-        $this->assertEquals('Vous devez saisir du contenu.', $errorContent);
+        $this->assertEquals(
+            'Vous devez saisir un titre.',
+            $errorTitle
+        );
+        $this->assertEquals(
+            'Vous devez saisir du contenu.',
+            $errorContent
+        );
 
         // SUCCESS
         $form = $crawler->selectButton('Ajouter')->form([
@@ -151,12 +175,12 @@ class TaskControllerTest extends WebTestCase
 
         $this->submitFormAndFollowRedirect($form);
 
-        $this->task = $this->repositoryTask->findOneBy([
+        $this->task = $this->repositoryTask?->findOneBy([
             'title' => 'test title',
             'content' => 'test content'
         ]);
 
-        $countTasksAfterAddNewTask = count($this->repositoryTask->findAll());
+        $countTasksAfterAddNewTask = count($this->repositoryTask?->findAll() ?? []);
 
         $this->assertInstanceOf(Task::class, $this->task);
         $this->assertNotNull($this->task);
@@ -165,36 +189,44 @@ class TaskControllerTest extends WebTestCase
 
     public function testUpdateTask(): void
     {
-        $this->task = $this->repositoryTask->findOneBy([
+        $this->task = $this->repositoryTask?->findOneBy([
             'title' => 'test title',
             'content' => 'test content'
         ]);
 
-        $idTask = $this->task->getId();
+        $idTask = $this->task?->getId() ?? -1;
 
         $this->client = $this->getClientAuthenticated();
+
+        $client = $this->client;
 
         // TEST NOT FOUND PAGE WITH ID NOT EXISTS
 
         $this->assertNotFoundPage(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_edit', ['id' => 20])
+            $this->urlGenerator?->generate('task_edit', ['id' => 20]) ?? ''
         );
 
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list')
+            $this->urlGenerator?->generate('task_list') ?? ''
         );
 
-        $crawler = $this->client->getCrawler();
-        $link = $crawler->selectLink($this->task->getTitle())->link();
+        $crawler = $client->getCrawler();
+        $link = $crawler->selectLink($this->task?->getTitle() ?? '')->link();
 
-        $this->client->click($link);
+        $client->click($link);
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/tasks/'.$idTask.'/edit', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(
+            Response::HTTP_OK,
+            $client->getResponse()->getStatusCode()
+        );
+        $this->assertEquals(
+            '/tasks/' . $idTask . '/edit',
+            $client->getRequest()->getPathInfo()
+        );
 
-        $crawler = $this->client->getCrawler();
+        $crawler = $client->getCrawler();
 
         $form = $crawler->selectButton('Modifier')->form([
             'task[title]' => 'edit test title',
@@ -203,119 +235,132 @@ class TaskControllerTest extends WebTestCase
 
         $this->submitFormAndFollowRedirect($form);
 
-        $this->task = $this->repositoryTask->findOneBy(['id' => $idTask,]);
+        $task = $this->repositoryTask?->findOneBy(['id' => $idTask]);
 
-        $this->assertInstanceOf(Task::class, $this->task);
-        $this->assertNotNull($this->task);
-        $this->assertEquals('edit test title', $this->task->getTitle());
-        $this->assertEquals('edit test content', $this->task->getContent());
-
+        $this->assertInstanceOf(Task::class, $task);
+        $this->assertNotNull($task);
+        $this->assertEquals(
+            'edit test title',
+            $task->getTitle()
+        );
+        $this->assertEquals(
+            'edit test content',
+            $task->getContent()
+        );
     }
 
     public function testToggleTask(): void
     {
-        $this->task = $this->repositoryTask->findOneBy([
+        $this->task = $this->repositoryTask?->findOneBy([
             'title' => 'edit test title',
             'content' => 'edit test content'
         ]);
 
-        $idTask = $this->task->getId();
+        $idTask = $this->task?->getId() ?? -1;
 
         $this->client = $this->getClientAuthenticated();
+        $client = $this->client;
 
         // TEST NOT FOUND PAGE WITH ID NOT EXISTS
 
         $this->assertNotFoundPage(
             Request::METHOD_POST,
-            $this->urlGenerator->generate('task_toggle', ['id' => 20])
+            $this->urlGenerator?->generate(
+                'task_toggle',
+                ['id' => 20]
+            ) ?? ''
         );
 
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list')
+            $this->urlGenerator?->generate('task_list') ?? ''
         );
 
-        $crawler = $this->client->getCrawler();
-        $form = $crawler->filter('form[action="/tasks/'.$idTask.'/toggle"]')->form();
+        $crawler = $client->getCrawler();
+        $form = $crawler->filter('form[action="/tasks/' . $idTask . '/toggle"]')->form();
 
         $this->submitFormAndFollowRedirect($form);
 
-        $this->task = $this->repositoryTask->findOneBy(['id' => $idTask]);
+        $task = $this->repositoryTask?->findOneBy(['id' => $idTask]);
 
-        $this->assertInstanceOf(Task::class, $this->task);
-        $this->assertNotNull($this->task);
-        $this->assertTrue($this->task->isDone());
-
+        $this->assertInstanceOf(Task::class, $task);
+        $this->assertNotNull($task);
+        $this->assertTrue($task->isDone());
     }
 
     public function testDeleteTask(): void
     {
-        $this->task = $this->repositoryTask->findOneBy([
+        $this->task = $this->repositoryTask?->findOneBy([
             'title' => 'edit test title',
             'content' => 'edit test content'
         ]);
 
-        $idTask = $this->task->getId();
+        $idTask = $this->task?->getId() ?? -1;
 
         $this->client = $this->getClientAuthenticated();
+        $client = $this->client;
 
         // TEST NOT FOUND PAGE WITH ID NOT EXISTS
 
         $this->assertNotFoundPage(
             Request::METHOD_POST,
-            $this->urlGenerator->generate('task_delete', ['id' => 20])
+            $this->urlGenerator?->generate(
+                'task_delete',
+                ['id' => 20]
+            ) ?? ''
         );
 
-        $this->client->request(
+        $client->request(
             Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list')
+            $this->urlGenerator?->generate('task_list') ?? ''
         );
 
-        $crawler = $this->client->getCrawler();
-        $form = $crawler->filter('form[action="/tasks/'.$idTask.'/delete"]')->form();
+        $crawler = $client->getCrawler();
+        $form = $crawler->filter('form[action="/tasks/' . $idTask . '/delete"]')->form();
 
         $this->submitFormAndFollowRedirect($form);
 
-        $this->task = $this->repositoryTask->findOneBy(['id' => $idTask]);
+        $task = $this->repositoryTask?->findOneBy(['id' => $idTask]);
 
-        $this->assertNull($this->task);
+        $this->assertNull($task);
     }
 
     private function assertNotFoundPage(string $method, string $path): void
     {
-        $this->client->request($method, $path);
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-
+        $this->client?->request($method, $path);
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client?->getResponse()->getStatusCode());
     }
 
     private function assertRedirectForGetAllRoutesTasksWithoutBeingAuthenticated(): void
     {
-        $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FOUND, $this->client?->getResponse()->getStatusCode());
 
-        $this->client->followRedirect();
+        $this->client?->followRedirect();
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/login', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals('/login', $this->client?->getRequest()->getPathInfo());
     }
 
     private function getClientAuthenticated(): KernelBrowser
     {
+        /** @var KernelBrowser $client */
+        $client = $this->client;
         return UtilsTests::createAuthenticatedClient(
-            $this->client,
-            $this->user->getUserIdentifier()
+            $client,
+            $this->user?->getUserIdentifier() ?? ''
         );
     }
 
     private function submitFormAndFollowRedirect(Form $form): void
     {
-        $this->client->submit($form);
+        $this->client?->submit($form);
 
-        $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FOUND, $this->client?->getResponse()->getStatusCode());
 
-        $this->client->followRedirect();
+        $this->client?->followRedirect();
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals('/tasks', $this->client->getRequest()->getPathInfo());
+        $this->assertEquals(Response::HTTP_OK, $this->client?->getResponse()->getStatusCode());
+        $this->assertEquals('/tasks', $this->client?->getRequest()->getPathInfo());
     }
 
     public function tearDown(): void

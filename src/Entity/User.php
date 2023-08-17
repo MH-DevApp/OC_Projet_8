@@ -23,6 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[NotBlank(message: 'Vous devez saisir un nom d\'utilisateur.')]
     private ?string $username = null;
 
+    /** @var array<int, string> $roles  */
     #[ORM\Column]
     private array $roles = [];
 
@@ -66,6 +67,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see UserInterface
+     *
+     * @return array<int, string>
      */
     public function getRoles(): array
     {
@@ -75,6 +78,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return array_unique($roles);
     }
+
+    /**
+     * @param array<int, string> $roles
+     */
 
     public function setRoles(array $roles): static
     {
