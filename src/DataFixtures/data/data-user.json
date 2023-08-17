@@ -1,0 +1,57 @@
+[
+  {
+    "username": "user",
+    "email": "user@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "webDevPro",
+    "email": "webDevPro@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "AIEnthusiast",
+    "email": "AIEnthusiast@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "DataGeek",
+    "email": "DataGeek@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "CyberNinja",
+    "email": "CyberNinja@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "CloudArchitect",
+    "email": "CloudArchitect@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "MobileDev",
+    "email": "MobileDev@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "UXDesigner",
+    "email": "UXDesigner@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "ProductManager",
+    "email": "ProductManager@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "TechInnovator",
+    "email": "TechInnovator@oc-p8.fr",
+    "roles": []
+  },
+  {
+    "username": "CodeCraftsman",
+    "email": "CodeCraftsman@oc-p8.fr",
+    "roles": []
+  }
+]
