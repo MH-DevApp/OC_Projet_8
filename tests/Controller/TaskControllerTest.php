@@ -6,6 +6,7 @@ use App\Repository\TaskRepository;
 use App\Entity\Task;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Form;
@@ -33,7 +34,7 @@ class TaskControllerTest extends WebTestCase
 
         $this->user = $manager
             ->getRepository(User::class)
-            ->findOneBy(['username' => 'user']);
+            ->findOneBy(['username' => 'admin']);
 
         /** @var TaskRepository $taskRepository */
         $taskRepository = $manager->getRepository(Task::class);
@@ -294,7 +295,44 @@ class TaskControllerTest extends WebTestCase
         $this->assertTrue($task->isDone());
     }
 
-    public function testDeleteTask(): void
+    public function testDeleteTaskByOtherAuthor(): void
+    {
+        $this->task = $this->repositoryTask?->findOneBy([
+            'title' => 'edit test title',
+            'content' => 'edit test content'
+        ]);
+
+        $idTask = $this->task?->getId() ?? -1;
+
+        /** @var KernelBrowser $client */
+        $client = $this->client;
+        $client = UtilsTests::createAuthenticatedClient($client, 'user');
+
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('task_list') ?? ''
+        );
+
+        // Test if the delete button is hide
+        $crawler = $client->getCrawler();
+        $form = $crawler->filter('form[action="/tasks/' . $idTask . '/delete"]')->getNode(0);
+
+        $this->assertNull($form);
+
+        // test delete task with direct url by Id
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('task_delete', ['id' => $idTask]) ?? ''
+        );
+
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+
+        $task = $this->repositoryTask?->findOneBy(['id' => $idTask]);
+
+        $this->assertNotNull($task);
+    }
+
+    public function testDeleteTaskByItsOwnAuthor(): void
     {
         $this->task = $this->repositoryTask?->findOneBy([
             'title' => 'edit test title',
