@@ -24,7 +24,10 @@ class TaskVoter extends Voter
         /** @var Task $task */
         $task = $subject;
 
-        if ($task->getAuthor() === $user) {
+        if (
+            $task->getAuthor() === $user ||
+            ($task->getAuthor() === null && in_array("ROLE_ADMIN", $user->getRoles()))
+        ) {
             return true;
         }
 
