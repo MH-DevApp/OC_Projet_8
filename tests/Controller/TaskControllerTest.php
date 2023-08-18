@@ -6,7 +6,6 @@ use App\Repository\TaskRepository;
 use App\Entity\Task;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use http\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Form;
@@ -353,6 +352,32 @@ class TaskControllerTest extends WebTestCase
                 ['id' => 20]
             ) ?? ''
         );
+
+        $client->request(
+            Request::METHOD_GET,
+            $this->urlGenerator?->generate('task_list') ?? ''
+        );
+
+        $crawler = $client->getCrawler();
+        $form = $crawler->filter('form[action="/tasks/' . $idTask . '/delete"]')->form();
+
+        $this->submitFormAndFollowRedirect($form);
+
+        $task = $this->repositoryTask?->findOneBy(['id' => $idTask]);
+
+        $this->assertNull($task);
+    }
+
+    public function testDeleteAnonymousAuthorTaskByAdmin(): void
+    {
+        $this->task = $this->repositoryTask?->findOneBy([
+            'author' => null
+        ]);
+
+        $idTask = $this->task?->getId() ?? -1;
+
+        $this->client = $this->getClientAuthenticated();
+        $client = $this->client;
 
         $client->request(
             Request::METHOD_GET,

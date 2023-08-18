@@ -21,8 +21,8 @@
                             {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
                         </button>
                     </form>
-                    {# show delete button for owner author of task #}
-                    {% if app.user == task.author %}
+                    {# [NEW FEATURE] show delete button for owner author of task or if author of task is anonymous then show delete button for admin only #}
+                    {% if app.user == task.author or (task.author == null and is_granted('ROLE_ADMIN')) %}
                         <form action="{{ path('task_delete', {'id' : task.id }) }}">
                             <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
                         </form>
