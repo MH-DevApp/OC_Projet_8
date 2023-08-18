@@ -92,6 +92,8 @@ class TaskController extends AbstractController
         Task $task,
         EntityManagerInterface $entityManager
     ): Response {
+        $this->denyAccessUnlessGranted("TASK_DELETE", $task);
+
         $entityManager->remove($task);
         $entityManager->flush();
 
