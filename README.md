@@ -6,18 +6,26 @@ For this 8th project, an existing project created using Symfony version 3.1 was 
 
 Additional functionalities were also outlined to be integrated into the application.
 
-**This branch of the repository concerns the initial project. A Docker environment and test setup have been added. Additionally, performance measurements of the application have been taken using Symfony Profiler on both a local and remote server.**
+**This branch of the repository concerns the final project with anomaly fixes and the addition of functionalities.**
+
+### DOCUMENTS
+___
+#### All UML diagrams of the project are available in the [diagrams](https://github.com/MH-DevApp/OC_Projet_8/tree/main/documents/diagrams) folder.
+
+#### The documents regarding the technical authentication documentation and the audit of code quality and performance are available in the [documents](https://github.com/MH-DevApp/OC_Projet_8/tree/develop/documents) folder.
+
+### ONLINE
+___
+If you'd like, you can test the [ToDo & Co V3.1](https://p8-legacy.mehdi-haddou.fr) and [ToDo & Co V5.4](https://p8.mehdi-haddou.fr:3000) versions by clicking on the corresponding version. Both of these applications are running in a development environment, which is why the Profiler toolbar is available. This will allow you to test the performance of both applications.
 
 ## Specs
-
-* PHP >= 5.5.9 **AND** < 7.2
-* Symfony 3.1
-* Bundles installed via Composer :
-    * Doctrine ORM ;
-    * Symfony SwiftMailer ;
-    * Symfony PHPUnit-Bridge (dev)
+___
+* PHP >= 8.1
+* Symfony 5.4 (LTS)
+* MySQL 8
 
 ## Install, build and run
+___
 
 First clone or download the source code and extract it.
 
@@ -25,8 +33,8 @@ First clone or download the source code and extract it.
 ___
 #### Requirements
 - You need to have composer on your computer
-- Your server needs PHP >= 5.5.9 AND < 7.2 (Recommended PHP v5.6)
-- MySQL 5.7
+- Your server needs PHP >= 8.1
+- MySQL 8
 - Apache or Nginx
 
 The following PHP extensions need to be installed and enabled :
@@ -34,8 +42,6 @@ The following PHP extensions need to be installed and enabled :
 - mysqli
 - intl
 - mb_string
-- mcrypt
-- xml
 
 #### Install
 
@@ -44,24 +50,30 @@ The following PHP extensions need to be installed and enabled :
     ```bash
     > composer install
     ```
-   
-    ##### Note: At the end of the dependency installation, you will be prompted to enter the information regarding your database. This should generate a `parameters.yml` file in the `./app/config` directory.
 
-   You can view the default example by clicking on the following link: [example](https://github.com/MH-DevApp/OC_Projet_8/blob/V3.1/app/config/parameters.yml.dist).
+2. Creation of a `.env.dev.local` file with the following information.
 
+    ##### Note: `*user*`, `*password*` and `*db_name*` should be replaced with your own credentials and name for your database.**
 
-2. To run the script for create database and load all fixtures:
+    example :
+    
+    ```dotenv
+    DATABASE_URL="mysql://*user*:*password*@127.0.0.1:3306/*db_name*?serverVersion=8&charset=utf8mb4"
+    MAILER_DSN=smtp://localhost:1025
+    ```
+
+3. To run the script for create database and load all fixtures:
 
     ```bash
     > composer run load
     ```
 
-5. To launch a development server:
+4. To launch a development server:
 
    **Note: Please free up port 3000 or modify it in the following command.**
 
     ```bash
-    > php bin/console server:start --port=3000
+    > php -S localhost:3000 -t public/
     ```
 
    or
@@ -70,17 +82,9 @@ The following PHP extensions need to be installed and enabled :
    > symfony serve -port=3000
    ```
 
-6. Clear the cache:
-
-   ##### A caching system has been implemented in the application. If you want to reset your application's cache, execute the following command:
-
-    ```bash
-    > php bin/console c:c --env=dev
-    ```
-
 The website is available at the url: https://localhost:3000
 
-The coverage of tests is available at : https://localhost:3000/coverage/
+The last coverage of tests is available at : https://localhost:3000/coverage/
 
 ### With Docker
 ___
@@ -94,23 +98,13 @@ Once your Docker configuration is up and ready, you can follow the instructions 
 1. To create a volume for the database:
 
     ```bash
-    > docker volume create oc_dev_5.7
+    > docker volume create oc_dev
     ```
    
-2. Create `parameters.yml` file in the folder `./app/config` with the following information:
+2. Creation of a `.env.dev.local` file with the following information:
 
-    ```yaml
-    parameters:
-      database_host: db
-      database_port: null
-      database_name: oc_p8_legacy
-      database_user: root
-      database_password: password
-      mailer_transport: smtp
-      mailer_host: 127.0.0.1
-      mailer_user: null
-      mailer_password: null
-      secret: ThisTokenIsNotSoSecret # Change it
+    ```dotenv
+    DATABASE_URL="mysql://root:password@db/oc_p8_dev?serverVersion=8&charset=utf8mb4"
     ```
 
 3. To build a Docker image:
@@ -136,24 +130,16 @@ Once your Docker configuration is up and ready, you can follow the instructions 
     ##### Note: The name of your PHP container may not be the same as `php`. 
     ##### Please execute the : `docker container ps` commandline in the terminal and check the names of the containers in the last column `NAMES`.
 
-5. Clear the cache:
-
-   ##### A caching system has been implemented in the application. If you want to reset your application's cache, execute the following command:
-
-    ```bash
-    > docker exec -it php symfony console c:c --env=dev
-    ```
-
-6. To destroy/remove a Docker image, you can use the following command:
+5. To destroy/remove a Docker image, you can use the following command:
 
     ```bash
     > docker-compose -f ../docker-compose.dev.yml down -v --remove-orphans
     ```
-   ##### The generated Docker containers uses Ubuntu 22.04 with PHP5.6, MySQL 5.7 and phpMyAdmin.
+   ##### The generated Docker containers uses PHP8.2, MySQL 8 and phpMyAdmin.
 
 The website is available at the url: https://localhost:3000
 
-The coverage of tests is available at : https://localhost:3000/coverage/
+The last coverage of tests is available at : https://localhost:3000/coverage/
 
 #### DBMS
 
@@ -168,11 +154,6 @@ This assumes that you have set up a Docker container running phpMyAdmin and conf
 
 Accounts:
 - Usernames availables: 
+  - `admin`
   - `user`
-  - `user1`
-  - `user2`
 - Password for all users: `123456`
-
-### ONLINE
-
-If you want, you can try this application online at : https://p8-legacy.mehdi-haddou.fr
