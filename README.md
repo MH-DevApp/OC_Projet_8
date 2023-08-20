@@ -12,7 +12,7 @@ Additional functionalities were also outlined to be integrated into the applicat
 ___
 #### All UML diagrams of the project are available in the [diagrams](https://github.com/MH-DevApp/OC_Projet_8/tree/main/documents/diagrams) folder.
 
-#### The documents regarding the technical authentication documentation and the audit of code quality and performance are available in the [documents](https://github.com/MH-DevApp/OC_Projet_8/tree/develop/documents) folder.
+#### The documents regarding the technical authentication documentation and the audit of code quality and performance are available in the [documents](https://github.com/MH-DevApp/OC_Projet_8/tree/main/documents) folder.
 
 ### ONLINE
 ___
